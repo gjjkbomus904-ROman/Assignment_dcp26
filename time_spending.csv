@@ -1,5 +1,5 @@
 date,activity,category,duration_hours,notes
-2026-10-19, University, Study,4,Attending university
+2026-10-19,University,Study,4,Attending university
 2026-10-19,Test preparation,Study,2,Prepared for the test
 2026-10-19,Gaming,Leisure,2,Played games
 2026-10-19,Talking with friends,Social,3,Talked with my friends
@@ -11,4 +11,4 @@ date,activity,category,duration_hours,notes
 2026-10-22,Talking with friends,Social,4,Talked with a friend
 2026-10-22,University,Study,3,Attending university
 2026-10-23,Training,Sport,2,Handball training
-2026-10-23, Talking with friend,Social,Talked with friend
+2026-10-23,Talking with friend,Social,Talked with friend
