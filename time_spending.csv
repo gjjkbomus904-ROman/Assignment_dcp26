@@ -2,13 +2,18 @@ date,activity,category,duration_hours,notes
 2026-10-19,University,Study,4,Attending university
 2026-10-19,Test preparation,Study,2,Prepared for the test
 2026-10-19,Gaming,Leisure,2,Played games
-2026-10-19,Talking with friends,Social,3,Talked with my friends
+2026-10-19,Talking,Social,3,Talked with my friends
 2026-10-20,Working,Work,9,Worked at my job
-2026-10-20,Talking with friends,Social,4,Talked with my friends
+2026-10-20,Talking,Social,4,Talked with my friends
 2026-10-21,Working,Work,8,Worked at my job
 2026-10-21,Test preparation,Study,2,Prepared for the second test
 2026-10-22,University,Study,5,Attending university
-2026-10-22,Talking with friends,Social,4,Talked with a friend
+2026-10-22,Talking,Social,4,Talked with a friend
 2026-10-23,University,Study,3,Attending university
 2026-10-23,Training,Sport,2,Handball training
-2026-10-23,Talking with friend,Social,3,Talked with friend
+2026-10-23,Talking,Social,3,Talked with friend
+2026-10-24,Competition,Sport,5,Competition with Handball
+2026-10-24,Trip with teammates,Trip,9,Trip to another town
+2026-10-25,Meeting,Meeting,9,Meeting with friends
+2026-10-26,Working,Work,8,Worked at my job
+2026-10-26,Talking,Social,2,Talked with my friend
