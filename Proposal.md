@@ -32,7 +32,4 @@ The current package contains the proposal, documentation, original data and a va
 
 ## References and assistance
 
-- [Assignment brief](https://github.com/skooter500/dcp26-assignment/dataset_assignment.md)
-- [README structure](https://github.com/skooter500/dcp26-assignment/README.MD)
-
 AI assistance was used to check the supplied CSV and draft this documentation. No dataset values were generated, replaced or inferred. The student should review the wording and be able to explain the project.
