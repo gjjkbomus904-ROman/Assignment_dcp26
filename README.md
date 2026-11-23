@@ -38,7 +38,7 @@ A Python application that stores my hand-recorded time log in SQLite, analyses i
 
 > **TODO (me):** add 2–3 photos of how I collect the data (notebook, phone notes…) in `images/` and link them here, e.g. `![notebook](images/notebook.jpg)`.
 >
-> **TODO (me):** describe how I really recorded the data (where, at what time of day, what I used to measure the duration, rounding) and explain gaps: the log stops on 2026-11-07, and several days were committed together (19–23 Oct on 24 Oct, 2–7 Nov on 8 Nov). Be honest about when entries were written.
+> **TODO (me):** describe how I really recorded the data (where, at what time of day, what I used to measure the duration, rounding) and explain gaps: the log stops on 2026-11-07, and several days were committed together (19–23 Oct on 24 Oct, 2–7 Nov on 8 Nov). I wrote down several days in a notebook and then added. Be honest about when entries were written.
 
 
 On start the program rebuilds the database from `data/time_spending.csv`, checks every row and prints any problems. Menu:
