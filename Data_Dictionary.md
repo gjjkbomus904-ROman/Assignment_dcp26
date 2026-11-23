@@ -1,21 +1,49 @@
 # Data Dictionary: My Daily Time Spending
 
-Source: `data/time_spending.csv`, copied unchanged from the user-supplied `time_spending(3).csv`. One row is one recorded activity entry. Multiple entries can share a date.
+Source: [`data/time_spending.csv`](data/time_spending.csv), recorded by hand. 33 rows on 20 consecutive days (2026-10-19 to 2026-11-07), 176 recorded hours. One row is one recorded activity. A day can have several rows.
 
-| Column | Logical type | Units / format | Meaning and observed values | Measurement status and validation |
+## CSV columns
+
+| Column | Type | Units / format | Observed values | How it is recorded and validated |
 | --- | --- | --- | --- | --- |
-| `date` | Date | `YYYY-MM-DD` | Calendar date associated with the activity; 2026-10-19 to 2026-10-30 | Recorded in source; require a valid date. Original entry time is unknown. |
-| `activity` | Categorical text | None | Activity label: University, Test preparation, Gaming, Talking, Working, Training, Competition, Trip with teammates, Meeting | Preserve the user's label; require nonempty text. Labels alone do not establish timing or overlap. |
-| `category` | Categorical text | None | Study, Leisure, Social, Work, Sport, Trip, Meeting | Preserve exact labels and case. Social and Meeting are distinct in the source; do not merge silently. |
-| `duration_hours` | Number | Hours | Recorded duration of the activity entry; observed values are whole numbers from 2 to 10 | Actual instrument and rounding are unspecified. Require a finite positive number; flag values over 24 for review. Decimal hours can be supported in future collection. |
-| `notes` | Text | None | Context supplied for the activity, such as test preparation or handball training | All current entries have notes. Preserve original wording; do not infer missing measurements from notes. |
+| `date` | Date | `YYYY-MM-DD` | 2026-10-19 to 2026-11-07, every day in the range has at least one row | The day the activity happened. Must be a valid date and not in the future. |
+| `activity` | Text | None | University, Test preparation, Gaming, Talking, Working, Training, Competition, Trip with teammates, Meeting | What I did, in my own words. Must not be empty. |
+| `category` | Categorical text | One of: Work, Study, Social, Meeting, Sport, Trip, Leisure | Work 7 rows, Study 9, Meeting 5, Social 8, Trip 1, Sport 2, Leisure 1 | My grouping of the activity. Must not be empty. Any other label is flagged as a warning. |
+| `duration_hours` | Number | Hours | Whole numbers from 2 to 10 so far | How long the activity took. Must be a number greater than 0 and at most 24. |
+| `notes` | Text | None | Short descriptions, e.g. "Worked at my job", "Handball training" | Optional. An empty note is stored as NULL in the database. |
+
+## Database table `activities` (SQLite)
+
+Built from the CSV by `src/db.py` every time the program starts.
+
+| Column | SQLite type | Constraint |
+| --- | --- | --- |
+| `id` | INTEGER | Primary key, added automatically (not in the CSV) |
+| `date` | TEXT | NOT NULL, ISO format |
+| `activity` | TEXT | NOT NULL |
+| `category` | TEXT | NOT NULL |
+| `duration_hours` | REAL | NOT NULL, `CHECK (duration_hours > 0 AND duration_hours <= 24)` |
+| `notes` | TEXT | May be NULL |
+
+## Derived columns (not recorded, calculated in pandas)
+
+| Column | Meaning |
+| --- | --- |
+| `weekday` | Day name calculated from `date` |
+| `is_weekend` | True for Saturday and Sunday |
+
+## Validation when loading
+
+- Rejected (row is not loaded, reason is printed): invalid or future date, empty activity or category, duration that is not a number or outside (0, 24].
+- Flagged only (row is loaded, a warning is printed): a category outside the list above, an exact duplicate row, a day with more than 24 recorded hours.
+- Current result: 33 rows loaded, 0 rejected, 0 warnings.
 
 ## Interpretation rules
 
-- No column is a unique record identifier. Exact duplicate rows should be flagged for review, not automatically deleted.
-- A day without a category entry means it was not recorded; it does not prove zero time was spent on that category.
-- The file does not contain start/end times, sleep or complete daily coverage. Do not fill the remainder of a day or assume activities cannot overlap.
-- Any future category mapping or correction should be documented separately from the original source.
-- Day of week may be calculated from `date`; it is not an original CSV column.
-
-These definitions document the existing file. They do not establish that measurement rules were agreed before collection. Historical collection details require the student's own evidence.
+- No column is a unique record identifier in the CSV, so exact duplicates are flagged and not deleted automatically: two identical entries could be genuine.
+- A day without a row for some category means it was not recorded. It does not prove that zero time was spent on it.
+- The log is not a complete account of every hour of a day: it has no start or end times and no sleep.
+- Activities can overlap. For example on 2026-10-24 a Competition (5 h) and a Trip (9 h) were recorded on the same day, giving 14 h.
+- Social and Meeting are kept as two separate categories, as I recorded them.
+- Durations are whole hours, so differences smaller than an hour cannot be seen.
+- How and when each entry was written down is described in the diary section of the [README](README.md).
