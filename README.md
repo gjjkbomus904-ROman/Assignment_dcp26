@@ -1,89 +1,83 @@
 # My Daily Time Spending
 
-Proposal-stage project package prepared on 30 October 2026.
+Data Centric Programming Assignment 2026 – [Assignment Brief](https://github.com/skooter500/dcp26-assignment/blob/main/dataset_assignment.md)
 
-## Questions
+# Questions
 
-1. Which categories have the greatest totals of recorded hours?
-2. How do recorded work and study hours compare?
-3. How do daily totals and categories vary between weekdays and weekends?
+1. Where does my recorded time go: which categories take the largest share of the hours?
+2. How different are Work and Study: in total hours and in the length of a typical session?
+3. Do I work and study on the same days, or do they exclude each other?
+4. Do my weeks look alike, or does the balance between Work and Study change from week to week?
+5. How do weekends differ from weekdays: in the amount of recorded time and in what fills it?
+6. Which days were the most and the least loaded, and what explains the extremes?
 
-## Data Dictionary
+# Data Dictionary
 
-One row represents one recorded activity entry. All fields are populated in the supplied file.
+One row = one activity I recorded by hand. A day can have several rows.
+Data file: [`data/time_spending.csv`](data/time_spending.csv). More detail in [Data_Dictionary.md](Data_Dictionary.md).
 
-| Column | Type | Units / format | Description and measurement |
+| Column | Type | Units / format | How I record it |
 | --- | --- | --- | --- |
-| `date` | Date | YYYY-MM-DD | Activity date as recorded by the user. Entry time is unknown. |
-| `activity` | Categorical text | None | User's activity label, for example Working or University. |
-| `category` | Categorical text | None | User's grouping: Work, Study, Leisure, Social, Sport, Trip or Meeting. |
-| `duration_hours` | Number | Hours | User's recorded duration. Instrument, rounding and overlap rules are not supplied. |
-| `notes` | Text | None | User's contextual description of the activity. |
+| `date` | Date | YYYY-MM-DD | The day the activity happened |
+| `activity` | Text (category label) | None | What I did, e.g. Working, University, Talking, Training |
+| `category` | Text (categorical) | Work, Study, Social, Meeting, Sport, Trip, Leisure | My grouping of the activity |
+| `duration_hours` | Number | Hours (whole numbers so far) | How long the activity took |
+| `notes` | Text | None | Short description of the activity |
 
-See [Data_Dictionary.md](Data_Dictionary.md) for observed values and validation rules.
+Rules: record the activity on the day it happens, one row per activity, durations in hours.
+An activity can overlap with another one (for example a competition during a trip day), so a day can add up to more than the time I was actually awake for a single activity.
 
-## Description of the project
+# Description of the project
 
-I plan to analyse my recorded activities to understand my allocation of time. The current CSV has 23 entries on 12 consecutive dates, 19–30 October 2026, totalling 120 recorded hours. It contains five columns, including dates, a numeric duration and categorical labels. The data covers selected activities rather than full 24-hour days.
+A Python application that stores my hand-recorded time log in SQLite, analyses it with pandas, draws charts with matplotlib and lets me explore it through a text menu.
 
-See [Proposal.md](Proposal.md) for the scope and development plan.
+- **Dataset:** 33 rows, 20 consecutive days (2026-10-19 to 2026-11-07), 176 recorded hours, 5 columns.
+- **Not a full diary:** it covers the main activities of the day, not every hour. A day without a Study row does not prove I did not study, it only means I did not record it.
 
-## Instructions for use
+## Data collection and diary
 
-Open `data/time_spending.csv` in a text editor or CSV viewer to inspect the original records. Read the proposal and validation report alongside it. There is no executable application in this proposal package.
+> **TODO (me):** add 2–3 photos of how I collect the data (notebook, phone notes…) in `images/` and link them here, e.g. `![notebook](images/notebook.jpg)`.
+>
+> **TODO (me):** describe how I really recorded the data (where, at what time of day, what I used to measure the duration, rounding) and explain gaps: the log stops on 2026-11-07, and several days were committed together (19–23 Oct on 24 Oct, 2–7 Nov on 8 Nov). Be honest about when entries were written.
 
-## How it works
 
-Planned flow: CSV validation, SQLite storage, SQL and pandas analysis, matplotlib charts, then a text menu for choosing analyses and filters. Implementation is future work.
+On start the program rebuilds the database from `data/time_spending.csv`, checks every row and prints any problems. Menu:
 
-## Findings
+```
+=== My Time Tracker ===
+1. Show entries (filter by category / dates)
+2. Run a prepared SQL query
+3. Analysis summary (pandas)
+4. Make charts (saved to charts/)
+5. Add an entry
+0. Exit
+```
 
-The following are direct descriptive calculations from the supplied file, not results from a completed application.
+"Add an entry" validates the input (real date, not in the future, number of hours between 0 and 24), appends the row to the CSV and the database. After adding, commit the CSV to GitHub.
 
-| Category | Entries | Recorded hours |
-| --- | ---: | ---: |
-| Work | 6 | 53 |
-| Social | 6 | 18 |
-| Study | 5 | 16 |
-| Meeting | 2 | 15 |
-| Trip | 1 | 9 |
-| Sport | 2 | 7 |
-| Leisure | 1 | 2 |
-| **Total** | **23** | **120** |
+# How it works:
 
-Work has the largest recorded total. Work exceeds Study by 37 recorded hours. Daily totals range from 6 to 14 hours. These figures cannot establish the distribution of all time spent: coverage is incomplete, overlapping activities cannot be ruled out, and the observation window is short.
-
-## Data collection evidence and reflection
-
-The file has entries for every date in its 12-day range, but it does not prove same-day collection. No collection photographs, diary, measurement method or GitHub history were supplied for verification. They have not been fabricated. The student should add genuine collection photographs and an account of the actual measurement process, including any rounding and overlapping activities.
-
-Social and Meeting are similar concepts but remain separate as recorded. Trip and Competition on 24 October may need clarification about overlap. The small weekend sample limits comparisons. Future collection should document duration measurement and maintain consistent category definitions.
-
-## List of files in the project
-
-| File | Source / purpose |
+| File | Role |
 | --- | --- |
-| `data/time_spending.csv` | Original user-supplied data, copied byte for byte |
-| `Proposal.md` | Project proposal drafted with AI assistance from the supplied data |
-| `README.md` | Project documentation drafted with AI assistance |
-| `Data_Dictionary.md` | Schema documentation drafted with AI assistance |
-| `Validation_Report.md` | Checks and calculations on the supplied CSV |
+| `src/db.py` | Creates the SQLite table (with a `CHECK` on the duration), validates each CSV row (date, empty text, unknown category, duration range, duplicates, days over 24 h) and loads it. Bad rows are rejected with a reason, odd rows are only flagged. |
+| `src/queries.py` | Six SQL queries using `GROUP BY`, `ORDER BY`, `WHERE`, `COUNT`, `SUM`, `AVG`. |
+| `src/analysis.py` | pandas functions (category summary, weekday analysis, weekday vs weekend, work vs study, correlation) and six matplotlib charts. |
+| `src/main.py` | The text menu. |
 
-## References
+The CSV is the source of truth (it is what I record and commit). The database is rebuilt from it on every start, so the two never disagree.
 
-- [Assignment brief](https://github.com/skooter500/dcp26-assignment/blob/main/dataset_assignment.md)
-- [Required README structure](https://github.com/skooter500/dcp26-assignment/blob/main/README.MD)
+# Findings
 
-The brief lists a pass/fail proposal repository submission but gives no 30 October deadline. That date is the requested preparation target; the course submission system should be checked for the official deadline.
+All numbers come from the program (menu options 2, 3 and 4) and match the current `data/time_spending.csv`: 33 rows, 20 days, 176 hours.
 
-## What I am most proud of in the assignment
+| Category | Entries | Hours | Share |
+| --- | ---: | ---: | ---: |
+| Work | 7 | 62 | 35% |
+| Study | 9 | 35 | 20% |
+| Meeting | 5 | 34 | 19% |
+| Social | 8 | 27 | 15% |
+| Trip | 1 | 9 | 5% |
+| Sport | 2 | 7 | 4% |
+| Leisure | 1 | 2 | 1% |
 
-Student reflection has not yet been supplied. This section will be completed by the student as the project develops.
 
-## What I learned
-
-Student reflection has not yet been supplied. Current data review shows why category definitions, measurement rules and coverage matter when interpreting totals.
-
-## AI assistance
-
-AI checked the provided file and drafted documentation. No data records or measurement values were generated or changed. Personal reflections, photographs and collection evidence must come from the student.
