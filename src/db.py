@@ -77,6 +77,34 @@ def load_csv(conn):
     conn.commit()
     return loaded, rejected
 
+def add_entry(conn, date, activity, category, hours, notes):
+    #Add one new row to the CSV file and to the database.
+
+    #Returns a text with the problem if the row is not valid, otherwise None
+    row = {"date": date, "activity": activity, "category": category,
+           "duration_hours": hours, "notes": notes}
+    problem = check_row(row)
+    if problem:
+        return problem
+
+    # make sure the last line of the CSV ends with a new line before adding to it
+    with open(CSV_PATH, "rb") as f:
+        text = f.read()
+    if not text.endswith(b"\n"):
+        with open(CSV_PATH, "a", newline="", encoding="utf-8") as f:
+            f.write("\r\n")
+
+    # the CSV is the main file, so the row goes there first
+    with open(CSV_PATH, "a", newline="", encoding="utf-8") as f:
+        csv.writer(f).writerow([date, activity, category, hours, notes])
+
+    conn.execute(
+        "INSERT INTO activities (date, activity, category, duration_hours, notes) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (date, activity, category, float(hours), notes),
+    )
+    conn.commit()
+    return None
 
 if __name__ == "__main__":
     conn = connect()
