@@ -42,7 +42,7 @@ Every day, I gathered information about what I did that day, but sometimes I for
 
 Menu: 1 show entries (filter), 2 SQL queries, 3 analysis, 4 charts (saved in `charts/`), 5 add an entry, 0 exit. Adding an entry checks the input and writes the row to the CSV and the database; then I commit the CSV.
 
-![Menu screenshot](screenshots/proof of list.jpg)
+![Menu screenshot](screenshots/proof of list.png)
 
 # How it works:
 
