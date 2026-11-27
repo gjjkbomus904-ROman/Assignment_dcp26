@@ -115,6 +115,6 @@ if __name__ == "__main__":
 
     # count the rows and add up the hours in the database
     rows, hours = conn.execute(
-        "SELECT COUNT(*), SUM(duration_hours) FROM activities").fetchone()
+        "Select count(*), Sum(duration_hours) From activities").fetchone()
     print("In the database:", rows, "rows,", hours, "hours")
     conn.close()

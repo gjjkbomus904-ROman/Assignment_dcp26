@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import analysis
 
 def save_and_show(file_name):
-    """Save the chart as a picture in the charts folder and show it."""
+    #Save the chart as a picture in the charts folder and show it
     os.makedirs("charts", exist_ok=True)
     plt.tight_layout()
     plt.savefig("charts/" + file_name)
@@ -24,7 +24,7 @@ def chart_daily(df):
     totals.plot(marker="o", rot=45)
     plt.title("Recorded hours per day")
     plt.ylabel("Hours")
-    save_and_show("daily_totals.png")
+    save_and_show("total_day.png")
 
 
 def chart_weekday(df):
@@ -36,14 +36,6 @@ def chart_weekday(df):
     plt.title("Average recorded hours by day of the week")
     plt.ylabel("Average hours per day")
     save_and_show("weekday_average.png")
-
-
-def chart_lengths(df):
-    df["duration_hours"].plot(kind="hist", bins=range(1, 12))
-    plt.title("How long my activities last")
-    plt.xlabel("Duration (hours)")
-    plt.ylabel("Number of entries")
-    save_and_show("duration_distribution.png")
 
 
 def chart_work_study(df):
@@ -62,14 +54,13 @@ def chart_weekly(df):
     plt.xlabel("Week starting on")
     plt.ylabel("Hours")
     plt.legend(bbox_to_anchor=(1, 1))  # put the legend outside of the bars
-    save_and_show("weekly_by_category.png")
+    save_and_show("hours_per_week.png")
 
 
 CHARTS = [
     ("Hours per category", chart_categories),
     ("Hours for every day", chart_daily),
-    ("Average hours by day of the week", chart_weekday),
-    ("How long my activities last", chart_lengths),
+    ("Average hours by day", chart_weekday),
     ("Work and study per day", chart_work_study),
     ("Hours per week", chart_weekly),
 ]
