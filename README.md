@@ -4,71 +4,51 @@ Data Centric Programming Assignment 2026 – [Assignment Brief](https://github.c
 
 # Questions
 
-1. Where does my recorded time go: which categories take the largest share of the hours?
-2. How different are Work and Study: in total hours and in the length of a typical session?
-3. Do I work and study on the same days, or do they exclude each other?
-4. Do my weeks look alike, or does the balance between Work and Study change from week to week?
-5. How do weekends differ from weekdays: in the amount of recorded time and in what fills it?
-6. Which days were the most and the least loaded, and what explains the extremes?
+1. Which categories take the largest share of my recorded hours?
+2. How different are Work and Study (total hours, length of a typical entry)?
+3. Do I work and study on the same days?
+4. Does the balance between Work and Study change from week to week?
+5. How do weekends differ from weekdays?
+6. Which days were the most and the least loaded?
 
 # Data Dictionary
 
-One row = one activity I recorded by hand. A day can have several rows.
-Data file: [`data/time_spending.csv`](data/time_spending.csv). More detail in [Data_Dictionary.md](Data_Dictionary.md).
+One row = one activity I recorded by hand. A day can have several rows. File: `data/time_spending.csv`.
 
 | Column | Type | Units / format | How I record it |
 | --- | --- | --- | --- |
 | `date` | Date | YYYY-MM-DD | The day the activity happened |
-| `activity` | Text (category label) | None | What I did, e.g. Working, University, Talking, Training |
+| `activity` | Text | – | What I did, e.g. Working, University, Talking, Training |
 | `category` | Text (categorical) | Work, Study, Social, Meeting, Sport, Trip, Leisure | My grouping of the activity |
 | `duration_hours` | Number | Hours (whole numbers so far) | How long the activity took |
-| `notes` | Text | None | Short description of the activity |
+| `notes` | Text | – | Short description of the activity |
 
-Rules: record the activity on the day it happens, one row per activity, durations in hours.
-An activity can overlap with another one (for example a competition during a trip day), so a day can add up to more than the time I was actually awake for a single activity.
+Rules: one row per activity, recorded on the day it happens. Activities can overlap, so a day can add up to a lot of hours (for example a competition during a trip on 2026-10-24: 14 h).
 
 # Description of the project
 
-A Python application that stores my hand-recorded time log in SQLite, analyses it with pandas, draws charts with matplotlib and lets me explore it through a text menu.
+A Python program that loads my hand-recorded time log into SQLite, checks the data, analyses it with pandas, draws charts with matplotlib and lets me explore it through a text menu.
 
-- **Dataset:** 33 rows, 20 consecutive days (2026-10-19 to 2026-11-07), 176 recorded hours, 5 columns.
-- **Not a full diary:** it covers the main activities of the day, not every hour. A day without a Study row does not prove I did not study, it only means I did not record it.
+- **Dataset:** 33 rows, 20 consecutive days (2026-10-19 to 2026-11-07), 176 hours, 5 columns.
+- **Not a full diary:** it covers the main activities, not every hour. A missing Study row means "not recorded", not "did not study".
 
 ## Data collection and diary
 
-> **TODO (me):** add 2–3 photos of how I collect the data (notebook, phone notes…) in `images/` and link them here, e.g. `![notebook](images/notebook.jpg)`.
->
-> **TODO (me):** describe how I really recorded the data (where, at what time of day, what I used to measure the duration, rounding) and explain gaps: the log stops on 2026-11-07, and several days were committed together (19–23 Oct on 24 Oct, 2–7 Nov on 8 Nov). I wrote down several days in a notebook and then added. Be honest about when entries were written.
+Every day, I gathered information about what I did that day, but sometimes I forgot to enter the data on a daily basis, so I used this list to make sure I didn't make any mistakes.
 
+![Menu screenshot](screenshots/menu.png)
 
-On start the program rebuilds the database from `data/time_spending.csv`, checks every row and prints any problems. Menu:
+# Instructions for use
 
-```
-=== My Time Tracker ===
-1. Show entries (filter by category / dates)
-2. Run a prepared SQL query
-3. Analysis summary (pandas)
-4. Make charts (saved to charts/)
-5. Add an entry
-0. Exit
-```
+Menu: 1 show entries (filter), 2 SQL queries, 3 analysis, 4 charts (saved in `charts/`), 5 add an entry, 0 exit. Adding an entry checks the input and writes the row to the CSV and the database; then I commit the CSV.
 
-"Add an entry" validates the input (real date, not in the future, number of hours between 0 and 24), appends the row to the CSV and the database. After adding, commit the CSV to GitHub.
+![Menu screenshot](screenshots/menu.png)
 
 # How it works:
 
-| File | Role |
-| --- | --- |
-| `src/db.py` | Creates the SQLite table (with a `CHECK` on the duration), validates each CSV row (date, empty text, unknown category, duration range, duplicates, days over 24 h) and loads it. Bad rows are rejected with a reason, odd rows are only flagged. |
-| `src/queries.py` | Six SQL queries using `GROUP BY`, `ORDER BY`, `WHERE`, `COUNT`, `SUM`, `AVG`. |
-| `src/analysis.py` | pandas functions (category summary, weekday analysis, weekday vs weekend, work vs study, correlation) and six matplotlib charts. |
-| `src/main.py` | The text menu. |
-
-The CSV is the source of truth (it is what I record and commit). The database is rebuilt from it on every start, so the two never disagree.
+The CSV is the main file. On every start the database is rebuilt from it, and every row is checked: bad dates, empty fields and durations outside 0–24 are rejected with a reason.
 
 # Findings
-
-All numbers come from the program (menu options 2, 3 and 4) and match the current `data/time_spending.csv`: 33 rows, 20 days, 176 hours.
 
 | Category | Entries | Hours | Share |
 | --- | ---: | ---: | ---: |
@@ -80,4 +60,25 @@ All numbers come from the program (menu options 2, 3 and 4) and match the curren
 | Sport | 2 | 7 | 4% |
 | Leisure | 1 | 2 | 1% |
 
+1. **Work is the biggest category** (62 h, about a third of the total).
+2. **Work comes in long blocks** (about 8.9 h per entry), **study in shorter ones** (about 3.9 h).
+3. **Work and study almost never share a day:** only 1 of 14 days has both, correlation r = −0.83. This mostly reflects my timetable, not cause and effect.
+4. **The weeks differ a lot:** work 17 h, 36 h and 9 h; study 16 h, 0 h and 19 h (the last week has only 6 recorded days).
+5. **Weekdays and weekends both average 8.8 h per day**, but weekends contain only Meeting, Social, Sport and Trip.
+6. **Busiest day:** 2026-10-24 (14 h). **Quietest:** 2026-11-06 (3 h).
 
+![Hours per category](charts/hours_by_category.png)
+![Work vs study](charts/work_vs_study.png)
+
+**Limits:** 20 days, 33 rows, whole-hour durations, weekend results rest on 5 days, and the log stops on 2026-11-07.
+
+# List of files in the project
+
+| Files | Source |
+| --- | --- |
+| data/time_spending.csv | Self recorded, by hand, by me |
+| src/db.py, queries.py, analysis.py, charts.py, menu.py | Written by me, with some help from AI, reviewed and run by me |
+| charts/*.png | Generated by `src/charts.py` |
+| README.md | Improved and added information using AI, edited by me |
+
+The data values are all mine, no AI. I wrote the code myself, with some improvements and minor corrections made using AI.
